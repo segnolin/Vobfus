@@ -18,6 +18,8 @@ void v_sub(v_register *v_reg)
   bool RSV[2];
   int  SIZE[2];
 
+  long long *operand[2];
+
   for (int i = 0; i < 2; i++) {
 
     // get opX_meta
@@ -41,18 +43,73 @@ void v_sub(v_register *v_reg)
     printf("op%d_RSV: %d\n", i, RSV[i]);
     printf("op%d_SIZE: %d\n", i, SIZE[i]);
 
-    // skip opX_data byte
-    if (REG[i]) {
-      v_code[idx++] = *(char *)(v_reg->v_rip);
+    // check reference
+    if (REF[i]) {
+      char reg = *(char *)(v_reg->v_rip);
+      v_code[idx++] = reg;
       v_reg->v_rip++;
+
+      operand[i] = (long long *)v_reg;
+      operand[i] += reg;
+      operand[i] = (long long *)*operand[i];
+
+      // check offset
+      if (IMM[i]) {
+        int imm_size = (1 << IMM[i]) - 1;
+        char imm[8] = {0};
+        strncpy(&v_code[idx], (char *)(v_reg->v_rip), imm_size);
+        strncpy(imm, (char *)(v_reg->v_rip), imm_size);
+        v_reg->v_rip += imm_size;
+        idx += imm_size;
+
+        if (SIGN) {
+          operand[i] = (long long *)((char *)operand[i] - *(long long *)imm);
+        }
+        else {
+          operand[i] = (long long *)((char *)operand[i] + *(long long *)imm);
+        }
+      }
     }
 
-    int data_size = (1 << IMM[i]) - 1;
-    strncpy(&v_code[idx], (char *)(v_reg->v_rip), data_size);
-    v_reg->v_rip += data_size;
-    idx += data_size;
+    // register or immediate
+    else {
 
+      // register
+      if (REG[i]) {
+        char reg = *(char *)(v_reg->v_rip);
+        v_code[idx++] = reg;
+        v_reg->v_rip++;
+
+        operand[i] = (long long *)v_reg;
+        operand[i] += reg;
+      }
+
+      // immediate
+      else {
+        int imm_size = (1 << IMM[i]) - 1;
+        char imm[8] = {0};
+        strncpy(&v_code[idx], (char *)(v_reg->v_rip), imm_size);
+        strncpy(imm, (char *)(v_reg->v_rip), imm_size);
+        v_reg->v_rip += imm_size;
+        idx += imm_size;
+
+        operand[i] = (long long *)imm;
+      }
+    }
     printf("\n");
+  }
+
+  if (SIZE[0] == 0) {
+    *(char *)operand[0] -= *(char *)operand[1];
+  }
+  else if (SIZE[0] == 1) {
+    *(short *)operand[0] -= *(short *)operand[1];
+  }
+  else if (SIZE[0] == 2) {
+    *(int *)operand[0] -= *(int *)operand[1];
+  }
+  else if (SIZE[0] == 3) {
+    *(long long *)operand[0] -= *(long long *)operand[1];
   }
 
   for (int i = 0; i < idx; i++) {
