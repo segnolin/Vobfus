@@ -32,3 +32,5 @@ void v_mov(v_register *v_reg);
 void v_add(v_register *v_reg);
 
 void v_sub(v_register *v_reg);
+
+void v_xor(v_register *v_reg);

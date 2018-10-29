@@ -30,7 +30,8 @@ reg_table = {
 inst_table = {
     'mov': '\x80',
     'add': '\x81',
-    'sub': '\x82'
+    'sub': '\x82',
+    'xor': '\x83'
 }
 
 class Code:

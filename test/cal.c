@@ -4,7 +4,7 @@ int func(int x, int y)
 {
   int a = x;
   int b = y;
-  return a + b;
+  return a ^ b;
 }
 
 int main(void)
