@@ -52,7 +52,7 @@ class Code:
         '''
         Vcode Format
 
-        [inst] [op1_meta] [op1_data] [op2_meta] [op2_data]
+        [inst] [op0_meta] [op0_data] [op1_meta] [op1_data]
 
         [inst]: 1 byte
         [opX_meta]: 1 byte [reg] [sign] [imm] [ref] [rsv] [size]
@@ -207,7 +207,7 @@ class Code:
     def print_vcode(self):
 
         for c in self.vcode:
-            print hex(ord(c)),
+            print '0x{:02x}'.format(ord(c)),
 
         print ''
         print '=================================================='
@@ -243,11 +243,8 @@ def translate(exec_name, func_start, func_end):
 
     output = 'char v_code[] = {'
     for i in range(len(vcode)):
-        output += "'\\x{:02x}'".format(ord(vcode[i]))
-        if i == len(vcode) - 1:
-            break
-        output += ', '
-    output += '};'
+        output += "'\\x{:02x}', ".format(ord(vcode[i]))
+    output += "'\\x00'};"
 
     print output
 
