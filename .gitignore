@@ -1,4 +1,7 @@
 *.swp
 *.pyc
 .DS_Store
+.gdb_history
+peda-session-main.txt
 cal
+main
