@@ -38,7 +38,8 @@ inst_table = {
     'jmp'   : '\x87',
     'jne'   : '\x88',
     'shl'   : '\x89',
-    'test'  : '\x8a'
+    'shr'   : '\x8a',
+    'test'  : '\x8b'
 }
 
 vaddr = 0

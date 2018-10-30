@@ -47,4 +47,6 @@ void v_jne(v_register *v_reg);
 
 void v_shl(v_register *v_reg);
 
+void v_shr(v_register *v_reg);
+
 void v_test(v_register *v_reg);
