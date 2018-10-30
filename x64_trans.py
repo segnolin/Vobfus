@@ -28,11 +28,20 @@ reg_table = {
 }
 
 inst_table = {
-    'mov': '\x80',
-    'add': '\x81',
-    'sub': '\x82',
-    'xor': '\x83'
+    'mov'   : '\x80',
+    'movsx' : '\x81',
+    'movsxd': '\x82',
+    'movzx' : '\x83',
+    'add'   : '\x84',
+    'sub'   : '\x85',
+    'xor'   : '\x86',
+    'jmp'   : '\x87',
+    'jne'   : '\x88',
+    'shl'   : '\x89',
+    'test'  : '\x8a'
 }
+
+vaddr = 0
 
 class Code:
 
@@ -42,6 +51,16 @@ class Code:
         self.opcode = opcode
         self.operand = operand
         self.vcode = ''
+        self.vaddr = 0
+
+        self.REG  = []
+        self.SIGN = []
+        self.IMM  = []
+        self.REF  = []
+        self.RSV  = []
+        self.SIZE = []
+        self.reg  = []
+        self.imm  = []
 
     def print_code(self):
 
@@ -99,6 +118,7 @@ class Code:
 
                     # set register
                     reg = reg_table[comps[2]]
+                    self.reg.append(reg)
 
                     # [size]
                     if comps[0] == 'qword':
@@ -134,6 +154,7 @@ class Code:
 
                         # set immediate
                         imm = int(imm, 16)
+                        self.imm.append(imm)
 
                 # for lea
                 else:
@@ -158,6 +179,7 @@ class Code:
 
                     # set immediate
                     imm = int(imm, 16)
+                    self.imm.append(imm)
 
                 # check register
                 else:
@@ -183,6 +205,7 @@ class Code:
 
                     # set register
                     reg = reg_table[op.decode('utf-8')]
+                    self.reg.append(reg)
 
             print 'REG:    {:b}'.format(REG)
             print 'SIGN:   {:b}'.format(SIGN)
@@ -193,6 +216,13 @@ class Code:
             print 'reg:    0x{:x}'.format(ord(reg))
             print 'imm:    0x{:x}'.format(imm)
             print ''
+
+            self.REG.append(REG)
+            self.SIGN.append(SIGN)
+            self.IMM.append(IMM)
+            self.REF.append(REF)
+            self.RSV.append(RSV)
+            self.SIZE.append(SIZE)
 
             # append opX_meta to vcode
             meta = chr((REG << 7) + (SIGN << 6) + (IMM << 4) + (REF << 3) + (RSV << 2) + SIZE)
@@ -205,8 +235,14 @@ class Code:
                 imml = 2 ** IMM - 1
                 self.vcode += p64(imm)[:imml]
 
+        # set virtual address
+        global vaddr
+        self.vaddr = vaddr
+        vaddr += len(self.vcode)
+
     def print_vcode(self):
 
+        print '0x{:x}:'.format(self.vaddr),
         for c in self.vcode:
             print '0x{:02x}'.format(ord(c)),
 
@@ -236,6 +272,26 @@ def translate(exec_name, func_start, func_end):
         code.print_code()
         code.virtualizatoin()
         code.print_vcode()
+
+    # jump relocation
+    for i in range(len(codes)):
+        if codes[i].opcode.startswith('j') and codes[i].REG[0] == 0b0:
+            tar_addr = codes[i].imm[0]
+            tar_vaddr = 0
+            for j in range(len(codes)):
+                if codes[j].addr == tar_addr:
+                    tar_vaddr = codes[j].vaddr
+
+            # modify vcode
+            curr_vaddr = codes[i].vaddr + len(codes[i].vcode)
+            mod_vcode = ''
+            if tar_vaddr > curr_vaddr:
+                offset = tar_vaddr - curr_vaddr
+                mod_vcode = codes[i].vcode[:2] + p64(offset)[:3]
+            else:
+                offset = curr_vaddr - tar_vaddr
+                mod_vcode = codes[i].vcode[:1] + '\x30' + p64(offset)[:3]
+            codes[i].vcode = mod_vcode
 
     # output
     vcode = ''

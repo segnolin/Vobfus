@@ -1,8 +1,8 @@
 #include "vm.h"
 
-void v_sub(v_register *v_reg)
+void v_movsx(v_register *v_reg)
 {
-  printf("sub\n");
+  printf("movsx\n");
 
   int idx = 0;
   char v_code[16];
@@ -99,17 +99,29 @@ void v_sub(v_register *v_reg)
     printf("\n");
   }
 
+  long long tmp = *operand[1];
+
+  if (SIZE[1] == 0) {
+    tmp = (long long)*(char *)&tmp;
+  }
+  else if (SIZE[1] == 1) {
+    tmp = (long long)*(short *)&tmp;
+  }
+  else if (SIZE[1] == 2) {
+    tmp = (long long)*(int *)&tmp;
+  }
+
   if (SIZE[0] == 0) {
-    *(char *)operand[0] -= *(char *)operand[1];
+    *(char *)operand[0] = *(char *)&tmp;
   }
   else if (SIZE[0] == 1) {
-    *(short *)operand[0] -= *(short *)operand[1];
+    *(short *)operand[0] = *(short *)&tmp;
   }
   else if (SIZE[0] == 2) {
-    *(int *)operand[0] -= *(int *)operand[1];
+    *(int *)operand[0] = *(int *)&tmp;
   }
   else if (SIZE[0] == 3) {
-    *(long long *)operand[0] -= *(long long *)operand[1];
+    *(long long *)operand[0] = *(long long *)&tmp;
   }
 
   for (int i = 0; i < idx; i++) {

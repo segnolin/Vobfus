@@ -62,7 +62,7 @@ void v_add(v_register *v_reg)
         v_reg->v_rip += imm_size;
         idx += imm_size;
 
-        if (SIGN) {
+        if (SIGN[i]) {
           operand[i] = (long long *)((char *)operand[i] - *(long long *)imm);
         }
         else {

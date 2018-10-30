@@ -29,8 +29,16 @@ typedef struct v_register
 
 void v_mov(v_register *v_reg);
 
+void v_movsx(v_register *v_reg);
+
+void v_movsxd(v_register *v_reg);
+
+void v_movzx(v_register *v_reg);
+
 void v_add(v_register *v_reg);
 
 void v_sub(v_register *v_reg);
 
 void v_xor(v_register *v_reg);
+
+void v_jmp(v_register *v_reg);
