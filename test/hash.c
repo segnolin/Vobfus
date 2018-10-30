@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-long long sdbm(char s[])
+long long sdbm(char *s)
 {
   long long hash = 0;
   int i = 0;
@@ -14,7 +14,10 @@ long long sdbm(char s[])
 
 int main(void)
 {
-  char s[] = "vobfus";
+  char s[64];
+
+  printf("input: ");
+  scanf("%s", s);
 
   printf("sdbm: %s --> %lld\n", s, sdbm(s));
 

@@ -42,3 +42,9 @@ void v_sub(v_register *v_reg);
 void v_xor(v_register *v_reg);
 
 void v_jmp(v_register *v_reg);
+
+void v_jne(v_register *v_reg);
+
+void v_shl(v_register *v_reg);
+
+void v_test(v_register *v_reg);
