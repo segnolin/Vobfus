@@ -1,10 +1,10 @@
 CC = gcc
 CFLAGS = -no-pie -fno-stack-protector
-TARGET = cal
-OBJECTS = cal.o
 
-all : $(TARGET)
+all: cal hash
 
-$(TARGET) : $(OBJECTS)
+cal: cal.c
 	$(CC) $(CFLAGS) -o $@ $^
-	rm *.o
+
+hash: hash.c
+	$(CC) $(CFLAGS) -o $@ $^
