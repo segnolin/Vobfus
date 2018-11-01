@@ -40,7 +40,7 @@ v_info *parse(v_register *v_reg, int size)
       v_reg->v_rip += imm_size;
       idx += imm_size;
 
-      info[i].operand = *(long long *)imm;
+      info[i].operand = (long long)imm;
     }
     // reference
     else if (info[i].REF) {
@@ -89,7 +89,7 @@ v_info *parse(v_register *v_reg, int size)
       }
 
       // check immediate
-      if (info[i].TYPE < 7) {
+      if (info[i].TYPE == 5 || info[i].TYPE == 6) {
         int avail_size[] = {1, 3};
         int imm_size = avail_size[info[i].TYPE - 5];
         char imm[8] = {0};
@@ -106,7 +106,7 @@ v_info *parse(v_register *v_reg, int size)
         }
       }
 
-      else {
+      else if (info[i].TYPE == 7){
         char imm[8] = {0};
         strncpy(&v_code[idx], (char *)(v_reg->v_rip), 1);
         strncpy(imm, (char *)(v_reg->v_rip), 1);
