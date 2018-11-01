@@ -69,4 +69,6 @@ void v_test(v_register *v_reg)
   else {
     v_reg->v_eflags &= ~0x80;
   }
+
+  free(info);
 }

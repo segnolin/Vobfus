@@ -14,4 +14,6 @@ void v_jne(v_register *v_reg)
       v_reg->v_rip -= *(long long *)info[0].operand;
     }
   }
+
+  free(info);
 }

@@ -18,4 +18,6 @@ void v_sub(v_register *v_reg)
   else if (info[0].SIZE == 3) {
     *(long long *)info[0].operand -= *(long long *)info[1].operand;
   }
+
+  free(info);
 }

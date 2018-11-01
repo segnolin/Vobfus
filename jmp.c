@@ -12,4 +12,6 @@ void v_jmp(v_register *v_reg)
   else {
     v_reg->v_rip += *(long long *)info[0].operand;
   }
+
+  free(info);
 }

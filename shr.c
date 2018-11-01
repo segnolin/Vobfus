@@ -18,4 +18,6 @@ void v_shr(v_register *v_reg)
   else if (info[0].SIZE == 3) {
     *(long long *)info[0].operand >>= *(int *)info[1].operand;
   }
+
+  free(info);
 }
