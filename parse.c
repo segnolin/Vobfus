@@ -50,17 +50,14 @@ v_info *parse(v_register *v_reg, int size)
       v_reg->v_rip++;
 
       info[i].operand = (long long)v_reg;
-      int m = 0;
-      int mul = 1;
+      int mul = 0;
       if (reg > 0x11) {
-        m = (reg & 0xc0) >> 6;
-        mul = 1 << m;
+        mul = (reg & 0xc0) >> 6;
         reg &= 0x3f;
       }
       info[i].operand += reg * 8;
-      //info[i].operand = (long long *)(*(info[i].operand) * mul);
       info[i].operand = *(long long *)(info[i].operand);
-      info[i].operand *= mul;
+      info[i].operand <<= mul;
 
       // check second register
       if (info[i].TYPE == 4 || info[i].TYPE == 7) {
@@ -70,16 +67,14 @@ v_info *parse(v_register *v_reg, int size)
         v_reg->v_rip++;
 
         tmp = (long long)v_reg;
-        int m = 0;
-        int mul = 1;
+        int mul = 0;
         if (reg > 0x11) {
-          m = (reg & 0xc0) >> 6;
-          mul = 1 << m;
+          mul = (reg & 0xc0) >> 6;
           reg &= 0x3f;
         }
         tmp += reg * 8;
         tmp = *(long long *)tmp;
-        tmp *= mul;
+        tmp <<= mul;
         if (info[i].SIGN & 0x2) {
           info[i].operand -= tmp;
         }
@@ -120,12 +115,6 @@ v_info *parse(v_register *v_reg, int size)
           info[i].operand += *(long long *)imm;
         }
       }
-
-      // de-reference
-      //info[i].operand = (long long *)*(info[i].operand);
-      //info[i].operand = *(long long *)(info[i].operand);
-      //info[i].operand = (long long *)(info[i].operand);
-      
     }
     // register only
     else {
