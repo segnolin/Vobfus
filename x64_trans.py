@@ -28,18 +28,32 @@ reg_table = {
 }
 
 inst_table = {
+    'nop'   : '',
+    'push'  : '',
+    'pop'   : '',
     'mov'   : '\x80',
     'movsx' : '\x81',
     'movsxd': '\x82',
     'movzx' : '\x83',
+    'cdqe'  : '',
+    'lea'   : '',
     'add'   : '\x84',
     'sub'   : '\x85',
     'xor'   : '\x86',
     'jmp'   : '\x87',
+    'je'    : '',
     'jne'   : '\x88',
+    'jl'    : '',
+    'jle'   : '',
+    'jg'    : '',
+    'jge'   : '',
     'shl'   : '\x89',
     'shr'   : '\x8a',
-    'test'  : '\x8b'
+    'cmp'   : '',
+    'test'  : '\x8b',
+    'call'  : '',
+    'div'   : '',
+    'imul'  : ''
 }
 
 vaddr = 0
@@ -54,11 +68,9 @@ class Code:
         self.vcode = ''
         self.vaddr = 0
 
-        self.REG  = []
+        self.TYPE  = []
         self.SIGN = []
-        self.IMM  = []
         self.REF  = []
-        self.RSV  = []
         self.SIZE = []
         self.reg  = []
         self.imm  = []
@@ -73,15 +85,21 @@ class Code:
         '''
         Vcode Format
 
-        [inst] [op0_meta] [op0_data] [op1_meta] [op1_data]
+        [inst] [opX_meta] [opX_data]
 
         [inst]: 1 byte
-        [opX_meta]: 1 byte [reg] [sign] [imm] [ref] [rsv] [size]
-            [reg]:  1 bit
-            [sign]: 1 bit
-            [imm]:  2 bit
+        [opX_meta]: 1 byte [type] [sign] [ref] [size]
+            [type]: 3 bit
+                000 -> [imm(1)]
+                001 -> [imm(3)]
+                010 -> [imm(8)]
+                011 -> [reg]
+                100 -> [reg] [reg]
+                101 -> [reg] [imm(1)]
+                110 -> [reg] [imm(3)]
+                111 -> [reg] [reg] [imm(1)]
+            [sign]: 2 bit
             [ref]:  1 bit
-            [rsv]:  1 bit
             [size]: 2 bit
         [opX_data]: 1~8 byte
         '''
@@ -93,148 +111,262 @@ class Code:
         ops = re.split(r', ', self.operand)
         for op in ops:
 
+            if op == '':
+                break
+
             print '< {} >'.format(op)
 
-            REG  = 0b0
-            SIGN = 0b0
-            IMM  = 0b00
+            TYPE = 0b000
+            SIGN = 0b00
             REF  = 0b0
-            RSV  = 0b0
             SIZE = 0b00
 
-            reg = '\x00'
+            reg = []
             imm = 0
 
-            # reference (always have register)
-            if '[' in op:
+            # immediate only
+            if op[0].isdigit():
 
-                # [reg] [ref]
-                REG = 0b1
+                # [imm]
+                imm_str = op.replace('0x', '')
+                imm = int(imm_str, 16)
+
+                # [type]
+                if len(imm_str) <= 2:
+                    TYPE = 0b000
+                elif len(imm_str) <= 6:
+                    TYPE = 0b001
+                elif len(imm_str) <= 16:
+                    TYPE = 0b010
+                else:
+                    print 'imm error'
+                    sys.exit(1)
+
+            # reference
+            elif '[' in op:
+
+                # [ref]
                 REF = 0b1
+
                 op = op.replace('[', '').replace(']', '')
+                comps = re.split(r' ', op)
 
-                # content
-                if 'ptr' in op:
-                    comps = re.split(r' ', op)
+                # [size]
+                if comps[0] == 'qword':
+                    SIZE = 0b11
+                elif comps[0] == 'dword':
+                    SIZE = 0b10
+                elif comps[0] == 'word':
+                    SIZE = 0b01
+                elif comps[0] == 'byte':
+                    SIZE = 0b00
+                else:
+                    print 'size error'
+                    sys.exit(1)
 
-                    # set register
-                    reg = reg_table[comps[2]]
-                    self.reg.append(reg)
+                comps = comps[2:]
 
-                    # [size]
-                    if comps[0] == 'qword':
-                        SIZE = 0b11
-                    elif comps[0] == 'dword':
-                        SIZE = 0b10
-                    elif comps[0] == 'word':
-                        SIZE = 0b01
-                    elif comps[0] == 'byte':
-                        SIZE = 0b00
+                # differentiate by component length
+                if len(comps) == 1:
+
+                    # [type]
+                    TYPE = 0b011
+
+                    # check if * in component
+                    if '*' in comps[0]:
+                        mul = comps[0][-1:]
+                        r = reg_table[comps[0][:-2]]
+                        if mul == '2':
+                            m = 0b01
+                        elif mul == '4':
+                            m = 0b10
+                        elif mul == '8':
+                            m = 0b11
+
+                        # [reg]
+                        reg.append(chr(ord(r) | (m << 6)))
+
                     else:
-                        print 'size error'
-                        sys.exit(1)
 
-                    # check offset
-                    if len(comps) == 5:
+                        # [reg]
+                        reg.append(reg_table[comps[0].decode('utf-8')])
 
-                        # [sign]
-                        if comps[3] == '-':
-                            SIGN = 0b1
+                elif len(comps) == 3:
+
+                    # [sign]
+                    if comps[1] == '-':
+                        SIGN = 0b10
+
+                    # differentiate by third component
+                    if comps[2][0].isdigit():
+
+                        # check if * in component
+                        if '*' in comps[0]:
+                            mul = comps[0][-1:]
+                            r = reg_table[comps[0][:-2]]
+                            if mul == '2':
+                                m = 0b01
+                            elif mul == '4':
+                                m = 0b10
+                            elif mul == '8':
+                                m = 0b11
+
+                            # [reg]
+                            reg.append(chr(ord(r) | (m << 6)))
+
+                        else:
+
+                            # [reg]
+                            reg.append(reg_table[comps[0].decode('utf-8')])
 
                         # [imm]
-                        imm = comps[4].replace('0x', '')
-                        if len(imm) <= 2:
-                            IMM = 0b01
-                        elif len(imm) <= 6:
-                            IMM = 0b10
-                        elif len(imm) <= 14:
-                            IMM = 0b11
+                        imm_str = comps[2].replace('0x', '')
+                        imm = int(imm_str, 16)
+
+                        # [type]
+                        if len(imm_str) <= 2:
+                            TYPE = 0b101
+                        elif len(imm_str) <= 6:
+                            TYPE = 0b110
                         else:
                             print 'imm error'
                             sys.exit(1)
 
-                        # set immediate
-                        imm = int(imm, 16)
-                        self.imm.append(imm)
+                    else:
 
-                # for lea
-                else:
-                    pass
+                        # [type]
+                        TYPE = 0b100
 
-            # register or immediate
-            else:
+                        for i in range(2):
+                            idx = i * 2
 
-                # check immediate 
-                if op[0].isdigit():
+                            # check if * in component
+                            if '*' in comps[idx]:
+                                mul = comps[idx][-1:]
+                                r = reg_table[comps[idx][:-2]]
+                                if mul == '2':
+                                    m = 0b01
+                                elif mul == '4':
+                                    m = 0b10
+                                elif mul == '8':
+                                    m = 0b11
+
+                                # [reg]
+                                reg.append(chr(ord(r) | (m << 6)))
+
+                            else:
+
+                                # [reg]
+                                reg.append(reg_table[comps[idx].decode('utf-8')])
+
+                elif len(comps) == 5:
+
+                    # [type]
+                    TYPE = 0b111
+
+                    # [sign]
+                    if comps[1] == '-':
+                        SIGN |= 0b10
+                    if comps[3] == '-':
+                        SIGN |= 0b01
+
+                    for i in range(2):
+                        idx = i * 2
+
+                        # check if * in component
+                        if '*' in comps[idx]:
+                            mul = comps[idx][-1:]
+                            r = reg_table[comps[idx][:-2]]
+                            if mul == '2':
+                                m = 0b01
+                            elif mul == '4':
+                                m = 0b10
+                            elif mul == '8':
+                                m = 0b11
+
+                            # [reg]
+                            reg.append(chr(ord(r) | (m << 6)))
+
+                        else:
+
+                            # [reg]
+                            reg.append(reg_table[comps[idx].decode('utf-8')])
 
                     # [imm]
-                    imm = op.replace('0x', '')
-                    if len(imm) <= 2:
-                        IMM = 0b01
-                    elif len(imm) <= 6:
-                        IMM = 0b10
-                    elif len(imm) <= 14:
-                        IMM = 0b11
-                    else:
-                        print 'imm error'
+                    imm_str = comps[4].replace('0x', '')
+                    imm = int(imm_str, 16)
 
-                    # set immediate
-                    imm = int(imm, 16)
-                    self.imm.append(imm)
-
-                # check register
                 else:
+                    print 'type error'
 
-                    # [reg]
-                    REG = 0b1
-                    
-                    # [size]
-                    if op.startswith('r'):
+            # register only
+            else:
+
+                # [type]
+                TYPE = 0b011
+
+                # [size]
+                if op.startswith('r'):
                         SIZE = 0b11
-                    elif op.startswith('e'):
-                        SIZE = 0b10
-                        op = op.replace('e', 'r')
-                    elif op.endswith('x'):
-                        SIZE = 0b01
-                        op = 'r' + op
-                    elif op.endswith('l'):
-                        SIZE = 0b00
-                        op = 'r' + op.replace('l', 'x')
-                    else:
-                        print 'size error'
-                        sys.exit(1)
+                elif op.startswith('e'):
+                    SIZE = 0b10
+                    op = op.replace('e', 'r')
+                elif op.endswith('x'):
+                    SIZE = 0b01
+                    op = 'r' + op
+                elif op.endswith('l'):
+                    SIZE = 0b00
+                    op = 'r' + op.replace('l', 'x')
+                else:
+                    print 'size error'
+                    sys.exit(1)
 
-                    # set register
-                    reg = reg_table[op.decode('utf-8')]
-                    self.reg.append(reg)
+                # [reg]
+                reg.append(reg_table[op.decode('utf-8')])
 
-            print 'REG:    {:b}'.format(REG)
-            print 'SIGN:   {:b}'.format(SIGN)
-            print 'IMM:    {0:02b}'.format(IMM)
+            print 'TYPE:   {0:03b}'.format(TYPE)
+            print 'SIGN:   {0:02b}'.format(SIGN)
             print 'REF:    {:b}'.format(REF)
-            print 'RSV:    {:b}'.format(RSV)
             print 'SIZE:   {0:02b}'.format(SIZE)
-            print 'reg:    0x{:x}'.format(ord(reg))
+            print 'reg:    {}'.format(reg)
             print 'imm:    0x{:x}'.format(imm)
             print ''
 
-            self.REG.append(REG)
+            self.TYPE.append(TYPE)
             self.SIGN.append(SIGN)
-            self.IMM.append(IMM)
             self.REF.append(REF)
-            self.RSV.append(RSV)
             self.SIZE.append(SIZE)
+            self.reg.append(reg)
+            self.imm.append(imm)
 
             # append opX_meta to vcode
-            meta = chr((REG << 7) + (SIGN << 6) + (IMM << 4) + (REF << 3) + (RSV << 2) + SIZE)
+            meta = chr((TYPE << 5) + (SIGN << 3) + (REF << 2) + SIZE)
             self.vcode += meta
 
             # append opX_data to vcode
-            if REG:
-                self.vcode += reg
-            if IMM:
-                imml = 2 ** IMM - 1
-                self.vcode += p64(imm)[:imml]
+            if TYPE == 0b000:
+                self.vcode += p64(imm)[:1]
+            elif TYPE == 0b001:
+                self.vcode += p64(imm)[:3]
+            elif TYPE == 0b010:
+                self.vcode += p64(imm)
+            elif TYPE == 0b011:
+                self.vcode += reg[0]
+            elif TYPE == 0b100:
+                self.vcode += reg[0]
+                self.vcode += reg[1]
+            elif TYPE == 0b101:
+                self.vcode += reg[0]
+                self.vcode += p64(imm)[:1]
+            elif TYPE == 0b110:
+                self.vcode += reg[0]
+                self.vcode += p64(imm)[:3]
+            elif TYPE == 0b111:
+                self.vcode += reg[0]
+                self.vcode += reg[1]
+                self.vcode += p64(imm)[:1]
+            else:
+                print 'type error'
 
         # set virtual address
         global vaddr
@@ -276,7 +408,7 @@ def translate(exec_name, func_start, func_end):
 
     # jump relocation
     for i in range(len(codes)):
-        if codes[i].opcode.startswith('j') and codes[i].REG[0] == 0b0:
+        if codes[i].opcode.startswith('j') and codes[i].TYPE[0] <= 0b010:
             tar_addr = codes[i].imm[0]
             tar_vaddr = 0
             for j in range(len(codes)):
