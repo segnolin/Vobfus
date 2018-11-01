@@ -27,33 +27,60 @@ reg_table = {
     'rsv': '\x11',
 }
 
+'''
 inst_table = {
-    'nop'   : '',
-    'push'  : '',
-    'pop'   : '',
+    'nop'   : '\x80',#
+    'push'  : '\x81',#
+    'pop'   : '\x82',#
+    'mov'   : '\x83',
+    'movsx' : '\x84',
+    'movsxd': '\x85',
+    'movzx' : '\x86',
+    'cdqe'  : '\x87',#
+    'lea'   : '\x88',#
+    'add'   : '\x89',
+    'sub'   : '\x8a',
+    'xor'   : '\x8b',
+    'jmp'   : '\x8c',
+    'je'    : '\x8d',#
+    'jne'   : '\x8e',
+    'jg'    : '\x8f',#
+    'jge'   : '\x90',#
+    'ja'    : '\x91',#
+    'jae'   : '\x92',#
+    'jl'    : '\x93',#
+    'jle'   : '\x94',#
+    'jb'    : '\x95',#
+    'jbe'   : '\x96',#
+    'jo'    : '\x97',#
+    'jno'   : '\x98',#
+    'jz'    : '\x99',#
+    'jnz'   : '\x9a',#
+    'js'    : '\x9b',#
+    'jns'   : '\x9c',#
+    'shl'   : '\x9d',
+    'shr'   : '\x9e',
+    'cmp'   : '\x9f',#
+    'test'  : '\xa0',
+    'call'  : '\xa1',#
+    'div'   : '\xa2',#
+    'imul'  : '\xa3' #
+}
+'''
+
+inst_table = {
     'mov'   : '\x80',
     'movsx' : '\x81',
     'movsxd': '\x82',
     'movzx' : '\x83',
-    'cdqe'  : '',
-    'lea'   : '',
     'add'   : '\x84',
     'sub'   : '\x85',
     'xor'   : '\x86',
     'jmp'   : '\x87',
-    'je'    : '',
     'jne'   : '\x88',
-    'jl'    : '',
-    'jle'   : '',
-    'jg'    : '',
-    'jge'   : '',
     'shl'   : '\x89',
     'shr'   : '\x8a',
-    'cmp'   : '',
     'test'  : '\x8b',
-    'call'  : '',
-    'div'   : '',
-    'imul'  : ''
 }
 
 vaddr = 0
@@ -189,7 +216,7 @@ class Code:
                     else:
 
                         # [reg]
-                        reg.append(reg_table[comps[0].decode('utf-8')])
+                        reg.append(reg_table[comps[0]])
 
                 elif len(comps) == 3:
 
@@ -217,7 +244,7 @@ class Code:
                         else:
 
                             # [reg]
-                            reg.append(reg_table[comps[0].decode('utf-8')])
+                            reg.append(reg_table[comps[0]])
 
                         # [imm]
                         imm_str = comps[2].replace('0x', '')
@@ -257,7 +284,7 @@ class Code:
                             else:
 
                                 # [reg]
-                                reg.append(reg_table[comps[idx].decode('utf-8')])
+                                reg.append(reg_table[comps[idx]])
 
                 elif len(comps) == 5:
 
@@ -290,7 +317,7 @@ class Code:
                         else:
 
                             # [reg]
-                            reg.append(reg_table[comps[idx].decode('utf-8')])
+                            reg.append(reg_table[comps[idx]])
 
                     # [imm]
                     imm_str = comps[4].replace('0x', '')
@@ -298,6 +325,7 @@ class Code:
 
                 else:
                     print 'type error'
+                    sys.exit(1)
 
             # register only
             else:
@@ -322,7 +350,7 @@ class Code:
                     sys.exit(1)
 
                 # [reg]
-                reg.append(reg_table[op.decode('utf-8')])
+                reg.append(reg_table[op])
 
             print 'TYPE:   {0:03b}'.format(TYPE)
             print 'SIGN:   {0:02b}'.format(SIGN)
@@ -367,6 +395,7 @@ class Code:
                 self.vcode += p64(imm)[:1]
             else:
                 print 'type error'
+                sys.exit(1)
 
         # set virtual address
         global vaddr
