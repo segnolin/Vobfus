@@ -27,6 +27,17 @@ typedef struct v_register
   long v_eflags;
 } v_register;
 
+typedef struct v_info
+{
+  int TYPE;
+  int SIGN;
+  bool REF;
+  int SIZE;
+  long long operand;
+} v_info;
+
+v_info *parse(v_register *v_reg, int size);
+
 void v_mov(v_register *v_reg);
 
 void v_movsx(v_register *v_reg);
