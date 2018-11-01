@@ -423,7 +423,7 @@ def translate(exec_name, func_start, func_end):
                 mod_vcode = codes[i].vcode[:2] + p64(offset)[:3]
             else:
                 offset = curr_vaddr - tar_vaddr
-                mod_vcode = codes[i].vcode[:1] + '\x60' + p64(offset)[:3]
+                mod_vcode = codes[i].vcode[:1] + '\x30' + p64(offset)[:3]
             codes[i].vcode = mod_vcode
 
     # output
