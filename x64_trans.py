@@ -27,7 +27,6 @@ reg_table = {
     'rsv': '\x11',
 }
 
-'''
 inst_table = {
     'nop'   : '\x80',#
     'push'  : '\x81',#
@@ -65,22 +64,6 @@ inst_table = {
     'call'  : '\xa1',#
     'div'   : '\xa2',#
     'imul'  : '\xa3' #
-}
-'''
-
-inst_table = {
-    'mov'   : '\x80',
-    'movsx' : '\x81',
-    'movsxd': '\x82',
-    'movzx' : '\x83',
-    'add'   : '\x84',
-    'sub'   : '\x85',
-    'xor'   : '\x86',
-    'jmp'   : '\x87',
-    'jne'   : '\x88',
-    'shl'   : '\x89',
-    'shr'   : '\x8a',
-    'test'  : '\x8b',
 }
 
 vaddr = 0
