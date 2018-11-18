@@ -11,7 +11,7 @@ void v_test(v_register *v_reg)
   int SF;
 
   if (info[0].SIZE == 0) {
-    char result = *(char *)info[0].operand & *(char *)info[0].operand;
+    char result = *(char *)info[0].operand & *(char *)info[1].operand;
     SF = (result & (1 << 7)) >> 7;
     ZF = (result) ? 0 : 1;
     for (int i = 0; i < 8; i++) {
@@ -19,7 +19,7 @@ void v_test(v_register *v_reg)
     }
   }
   else if (info[0].SIZE == 1) {
-    short result = *(short *)info[0].operand & *(short *)info[0].operand;
+    short result = *(short *)info[0].operand & *(short *)info[1].operand;
     SF = (result & (1 << 15)) >> 15;
     ZF = (result) ? 0 : 1;
     for (int i = 0; i < 16; i++) {
@@ -27,7 +27,7 @@ void v_test(v_register *v_reg)
     }
   }
   else if (info[0].SIZE == 2) {
-    int result = *(int *)info[0].operand & *(int *)info[0].operand;
+    int result = *(int *)info[0].operand & *(int *)info[1].operand;
     SF = (result & (1 << 31)) >> 31;
     ZF = (result) ? 0 : 1;
     for (int i = 0; i < 32; i++) {
@@ -35,7 +35,7 @@ void v_test(v_register *v_reg)
     }
   }
   else if (info[0].SIZE == 3) {
-    long long result = *(long long *)info[0].operand & *(long long *)info[0].operand;
+    long long result = *(long long *)info[0].operand & *(long long *)info[1].operand;
     SF = (result & (1LL << 63)) >> 63;
     ZF = (result) ? 0 : 1;
     for (int i = 0; i < 64; i++) {

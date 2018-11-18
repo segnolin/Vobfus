@@ -11,7 +11,7 @@ void v_jne(v_register *v_reg)
       v_reg->v_rip -= *(long long *)info[0].operand;
     }
     else {
-      v_reg->v_rip -= *(long long *)info[0].operand;
+      v_reg->v_rip += *(long long *)info[0].operand;
     }
   }
 

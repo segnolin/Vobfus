@@ -51,7 +51,7 @@ v_info *parse(v_register *v_reg, int size)
 
       info[i].operand = (long long)v_reg;
       int mul = 0;
-      if (reg > 0x11) {
+      if ((reg & 0xff) > 0x11) {
         mul = (reg & 0xc0) >> 6;
         reg &= 0x3f;
       }
@@ -68,7 +68,7 @@ v_info *parse(v_register *v_reg, int size)
 
         tmp = (long long)v_reg;
         int mul = 0;
-        if (reg > 0x11) {
+        if ((reg & 0xff) > 0x11) {
           mul = (reg & 0xc0) >> 6;
           reg &= 0x3f;
         }
