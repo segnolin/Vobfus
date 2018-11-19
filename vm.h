@@ -4,6 +4,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#define DEBUG //
+
 typedef struct v_register
 {
   long long v_rax;

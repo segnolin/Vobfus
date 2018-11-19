@@ -2,7 +2,7 @@
 
 void v_xor(v_register *v_reg)
 {
-  printf("xor\n");
+  DEBUG("xor\n");
 
   v_info *info = parse(v_reg, 2);
 

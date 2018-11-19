@@ -2,7 +2,7 @@
 
 void v_cdqe(v_register *v_reg)
 {
-  printf("cdqe\n");
+  DEBUG("cdqe\n");
 
   v_info *info = parse(v_reg, 0);
 

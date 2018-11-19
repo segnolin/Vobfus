@@ -2,7 +2,7 @@
 
 void v_jl(v_register *v_reg)
 {
-  printf("jl\n");
+  DEBUG("jl\n");
 
   v_info *info = parse(v_reg, 1);
 

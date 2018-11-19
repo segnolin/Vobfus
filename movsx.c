@@ -2,7 +2,7 @@
 
 void v_movsx(v_register *v_reg)
 {
-  printf("movsx\n");
+  DEBUG("movsx\n");
 
   v_info *info = parse(v_reg, 2);
 

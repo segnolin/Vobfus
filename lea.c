@@ -2,7 +2,7 @@
 
 void v_lea(v_register *v_reg)
 {
-  printf("lea\n");
+  DEBUG("lea\n");
 
   v_info *info = parse(v_reg, 2);
 

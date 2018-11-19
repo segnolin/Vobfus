@@ -2,7 +2,7 @@
 
 void v_jne(v_register *v_reg)
 {
-  printf("jne\n");
+  DEBUG("jne\n");
 
   v_info *info = parse(v_reg, 1);
 

@@ -2,7 +2,7 @@
 
 void v_js(v_register *v_reg)
 {
-  printf("js\n");
+  DEBUG("js\n");
 
   v_info *info = parse(v_reg, 1);
 

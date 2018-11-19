@@ -2,7 +2,7 @@
 
 void v_cmp(v_register *v_reg)
 {
-  printf("cmp\n");
+  DEBUG("cmp\n");
 
   v_info *info = parse(v_reg, 2);
 

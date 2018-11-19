@@ -2,7 +2,7 @@
 
 void v_sub(v_register *v_reg)
 {
-  printf("sub\n");
+  DEBUG("sub\n");
 
   v_info *info = parse(v_reg, 2);
 

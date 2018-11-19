@@ -24,11 +24,11 @@ v_info *parse(v_register *v_reg, int size)
     info[i].REF  = (meta & 0x4) >> 2;
     info[i].SIZE = (meta & 0x3);
 
-    printf("op%d_TYPE: %d\n", i, info[i].TYPE);
-    printf("op%d_SIGN: %d\n", i, info[i].SIGN);
-    printf("op%d_REF:  %d\n", i, info[i].REF);
-    printf("op%d_SIZE: %d\n", i, info[i].SIZE);
-    printf("\n");
+    DEBUG("op%d_TYPE: %d\n", i, info[i].TYPE);
+    DEBUG("op%d_SIGN: %d\n", i, info[i].SIGN);
+    DEBUG("op%d_REF:  %d\n", i, info[i].REF);
+    DEBUG("op%d_SIZE: %d\n", i, info[i].SIZE);
+    DEBUG("\n");
 
     // immediate only
     if (info[i].TYPE <= 2) {
@@ -129,9 +129,9 @@ v_info *parse(v_register *v_reg, int size)
 
   // print v_code
   for (int i = 0; i < idx; i++) {
-    printf("0x%02x ", v_code[i] & 0xff);
+    DEBUG("0x%02x ", v_code[i] & 0xff);
   }
-  printf("\n");
+  DEBUG("\n");
 
   return info;
 }

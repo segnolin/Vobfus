@@ -2,7 +2,7 @@
 
 void v_test(v_register *v_reg)
 {
-  printf("test\n");
+  DEBUG("test\n");
 
   v_info *info = parse(v_reg, 2);
 

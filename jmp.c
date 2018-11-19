@@ -2,7 +2,7 @@
 
 void v_jmp(v_register *v_reg)
 {
-  printf("jmp\n");
+  DEBUG("jmp\n");
 
   v_info *info = parse(v_reg, 1);
 
