@@ -28,38 +28,38 @@ reg_table = {
 }
 
 inst_table = {
-    'nop'   : '\x80',#
+    'nop'   : '\x80',
     'push'  : '\x81',#
     'pop'   : '\x82',#
     'mov'   : '\x83',
     'movsx' : '\x84',
     'movsxd': '\x85',
     'movzx' : '\x86',
-    'cdqe'  : '\x87',#
-    'lea'   : '\x88',#
+    'cdqe'  : '\x87',
+    'lea'   : '\x88',
     'add'   : '\x89',
     'sub'   : '\x8a',
     'xor'   : '\x8b',
     'jmp'   : '\x8c',
-    'je'    : '\x8d',#
+    'je'    : '\x8d',
     'jne'   : '\x8e',
-    'jg'    : '\x8f',#
-    'jge'   : '\x90',#
-    'ja'    : '\x91',#
-    'jae'   : '\x92',#
-    'jl'    : '\x93',#
-    'jle'   : '\x94',#
-    'jb'    : '\x95',#
-    'jbe'   : '\x96',#
-    'jo'    : '\x97',#
-    'jno'   : '\x98',#
-    'jz'    : '\x99',#
-    'jnz'   : '\x9a',#
-    'js'    : '\x9b',#
-    'jns'   : '\x9c',#
+    'jg'    : '\x8f',
+    'jge'   : '\x90',
+    'ja'    : '\x91',
+    'jae'   : '\x92',
+    'jl'    : '\x93',
+    'jle'   : '\x94',
+    'jb'    : '\x95',
+    'jbe'   : '\x96',
+    'jo'    : '\x97',
+    'jno'   : '\x98',
+    'jz'    : '\x99',
+    'jnz'   : '\x9a',
+    'js'    : '\x9b',
+    'jns'   : '\x9c',
     'shl'   : '\x9d',
     'shr'   : '\x9e',
-    'cmp'   : '\x9f',#
+    'cmp'   : '\x9f',
     'test'  : '\xa0',
     'call'  : '\xa1',#
     'div'   : '\xa2',#
